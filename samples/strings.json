@@ -1,0 +1,17 @@
+{
+  "app_name": "Photo Editor",
+  "version": 3,
+  "homepage_url": "https://example.com",
+  "buttons": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "save": "Save changes",
+    "delete_confirm": "Are you sure you want to delete this photo?"
+  },
+  "messages": {
+    "welcome": "Welcome back, {username}!",
+    "upload_done": "Your photo has been uploaded successfully.",
+    "error": "Something went wrong. Please try again later."
+  },
+  "menu": ["File", "Edit", "View", "Help"]
+}

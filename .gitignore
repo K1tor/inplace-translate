@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.bak
+_err.log
+_out.log
+_pid.txt
+_shot*

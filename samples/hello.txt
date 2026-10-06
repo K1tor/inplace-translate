@@ -1,0 +1,15 @@
+InPlace Translate is a simple, powerful text translation tool.
+
+The story begins in a small village where a young developer worked late into
+the night. She wanted to share her favorite novel with friends around the
+world, but every translation tool she tried would only show the result on
+screen — never writing it back into the file itself.
+
+So she built her own tool. It reads a file, translates every paragraph, and
+saves the result right back where the original text lived. Subtitles keep
+their timelines. Lyrics keep their timestamps. Markdown keeps its code
+blocks. And JSON files keep their keys and structure, with only the values
+translated.
+
+Today the tool supports Microsoft Bing, Google, DeepL, and any OpenAI
+compatible service. One command, and the whole world can read your words.

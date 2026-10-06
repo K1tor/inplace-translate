@@ -1,0 +1,2 @@
+This is a legacy file saved in GBK encoding.
+这里还有一行中文内容，用来测试非 UTF-8 编码。

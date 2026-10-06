@@ -1,0 +1,11 @@
+1
+00:00:01,000 --> 00:00:04,000
+Hello, and welcome to the show!
+
+2
+00:00:04,500 --> 00:00:08,200
+Today we will talk about a very special tool.
+
+3
+00:00:09,000 --> 00:00:12,500
+It can translate your files automatically.
