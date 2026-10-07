@@ -26,37 +26,42 @@ python translator.py novel.txt -t zh-CN --out novel.zh.txt
 
 也可以直接把文件**拖到 `translate.bat` 图标上**，按提示输入目标语言即可。
 
-## 悬浮窗实时翻译
+## 悬浮窗声音翻译
 
 ```bash
-python floating.py       # 或双击 悬浮窗翻译.bat（无控制台窗口）
+python floating.py        # 或双击 悬浮窗翻译.bat（无控制台窗口）
+python floating.py --live # 启动时直接开启系统声音识别
 ```
 
-全自动检测要翻译的内容，无需手动输入：
+实时声音翻译，全程无需手动输入：
 
-- **窗口监控**：勾选"窗口"并从列表中选择任意程序——浏览器、**游戏**、播放器都可以（支持搜索；无标题的窗口按进程名显示）。每秒自动识别该窗口内的文字（Windows 自带 OCR），只翻译有变化的部分。窗口移动、切换都能跟随；被遮挡的窗口也能抓取（PrintWindow）
-- **声音翻译**（两个声音源，可同时开）：
-  - ☑ **声音**：识别**麦克风**，翻译你说的话
-  - ☑ **直播**：识别**系统正在播放的声音**（直播/游戏语音/视频配音），通过 WASAPI 环回直接抓取播放音频流，无需任何 Windows 设置
-- **剪贴板监控**：复制任意文本（Ctrl+C）自动翻译
+- ☑ **声音**：识别**麦克风**，你说的话实时翻译
+- ☑ **直播**：识别**系统正在播放的声音**（直播/游戏语音/视频配音），通过 WASAPI 环回直接抓取播放音频流，无需任何 Windows 设置
 - 输入框仅作备用：打字/粘贴也会实时翻译（0.6 秒防抖）
+- 两个声音源可同时开启；断句超时已调优（说完约 0.5 秒即出句），大模型引擎无请求间隔
 
-窗口操作：拖标题栏移动位置；点 `▾` 收起成小条；`Esc`（焦点不在输入框时）或 `✕` 关闭。底部可切换目标语言（切换后立即重翻当前内容）；点"复制"一键复制译文。
+窗口操作：拖标题栏移动位置；点 `▾` 收起成小条；`Esc`（焦点不在输入框时）或 `✕` 关闭。底部可切换目标语言（切换后立即重翻）；点"复制"一键复制译文。
 
-命令行参数：
+> 提示：语音识别用 Windows 自带引擎（`voice_lang` 可改语言，默认中文普通话），识别质量取决于发音清晰度，低置信度结果已自动过滤；监控子进程随主窗口关闭自动退出。
 
-```bash
-python floating.py --window Edge                 # 按标题/进程名关键字直接选窗口
-python floating.py --region 100,600,640,120      # 改为监控固定屏幕区域(左,上,宽,高)
-python floating.py --voice                       # 启动时同时开启麦克风识别
-python floating.py --live                        # 启动时同时开启系统声音识别
+## 大模型翻译（默认，更快更准）
+
+`config.json` 默认引擎为大模型，预配置智谱 GLM（国内直连、无需代理）：
+
+```json
+{
+  "engine": "openai",
+  "openai_base": "https://open.bigmodel.cn/api/paas/v4",
+  "openai_model": "glm-4-flash",
+  "openai_key": "在这里填你的 API Key"
+}
 ```
 
-> 提示：
-> - OCR 识别语言默认自动（中文系统优先中文引擎），`config.json` 的 `ocr_lang` 可指定；语音识别语言 `voice_lang` 可指定（默认中文普通话）
-> - **独占全屏**运行的游戏建议改为"无边框窗口"模式，抓取更稳定；游戏窗口正常出现在选择列表里（按进程名查找）
-> - 整窗 OCR 对小字号界面有识别噪声；语音识别质量取决于发音清晰度，低置信度结果已自动过滤
-> - 监控子进程随主窗口关闭自动退出，不会残留
+- `glm-4-flash` **免费**且速度快：到 [open.bigmodel.cn](https://open.bigmodel.cn) 注册 → 控制台 → API Keys，复制填入 `openai_key` 即可
+- 兼容任何 OpenAI 格式接口：OpenAI（`https://api.openai.com/v1` + `gpt-4o-mini`）、DeepSeek（`https://api.deepseek.com/v1` + `deepseek-chat`）、Moonshot 等都可以改 `openai_base` / `openai_model` 接入
+- 密钥也可用环境变量：`OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_MODEL`
+- **未配置密钥时自动回退 Bing 免费引擎**（国内直连），功能不受影响
+- 大模型引擎已关闭请求间隔，配合语音断句优化，说完一句话约 1-2 秒出译文
 
 ## 常用参数
 
@@ -94,22 +99,19 @@ python translator.py . -r -t zh-CN --ext txt,srt --backup
 
 ## 引擎与代理
 
-默认 `bing` 引擎直连使用，无需任何配置。切换引擎编辑 `config.json`：
+默认引擎为**大模型**（智谱 GLM，配置见上一节），未填密钥自动回退 `bing`（国内直连、无需配置）。也可以显式切换引擎，编辑 `config.json`：
 
 ```json
 {
   "engine": "google",
   "proxy": "http://127.0.0.1:7890",
-  "deepl_api_key": "你的免费密钥(以 :fx 结尾)",
-  "openai_base": "https://api.openai.com/v1",
-  "openai_key": "sk-...",
-  "openai_model": "gpt-4o-mini"
+  "deepl_api_key": "你的免费密钥(以 :fx 结尾)"
 }
 ```
 
 - `google` 引擎在国内需要代理（`config.json` 的 `proxy` 或环境变量 `HTTPS_PROXY`）；代理失败会自动尝试直连。
 - `deepl` 免费 API 密钥在 [deepl.com/pro-api](https://www.deepl.com/pro-api) 注册获取。
-- `openai` 引擎兼容任何 OpenAI 格式接口（中转站也可以，改 `openai_base` 即可）。
+- `openai` 引擎兼容任何 OpenAI 格式接口（智谱/OpenAI/DeepSeek/中转站，改 `openai_base` 即可）。
 
 密钥也可以用环境变量：`DEEPL_API_KEY`、`OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_MODEL`。
 

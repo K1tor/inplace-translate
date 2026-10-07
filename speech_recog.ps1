@@ -228,8 +228,8 @@ if ($Source -eq "system") {
 [Console]::Out.Flush()
 
 $engine.LoadGrammar((New-Object System.Speech.Recognition.DictationGrammar))
-$engine.EndSilenceTimeout = [TimeSpan]::FromMilliseconds(700)
-$engine.EndSilenceTimeoutAmbiguous = [TimeSpan]::FromMilliseconds(900)
+$engine.EndSilenceTimeout = [TimeSpan]::FromMilliseconds(500)
+$engine.EndSilenceTimeoutAmbiguous = [TimeSpan]::FromMilliseconds(700)
 
 $events = New-Object System.Collections.ArrayList
 $sync = [System.Collections.ArrayList]::Synchronized($events)

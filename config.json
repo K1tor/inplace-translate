@@ -1,13 +1,12 @@
 {
-  "engine": "bing",
+  "engine": "openai",
   "target": "",
   "proxy": "",
   "delay": 0.3,
   "chunk": 1000,
-  "ocr_lang": "",
   "voice_lang": "",
-  "deepl_api_key": "",
-  "openai_base": "https://api.openai.com/v1",
+  "openai_base": "https://open.bigmodel.cn/api/paas/v4",
   "openai_key": "",
-  "openai_model": "gpt-4o-mini"
+  "openai_model": "glm-4-flash",
+  "deepl_api_key": ""
 }

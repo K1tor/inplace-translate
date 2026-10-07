@@ -281,6 +281,14 @@ class DeeplEngine:
         return self.call_many([text])[0]
 
 
+LANG_NAMES = {"zh-Hans": "Simplified Chinese", "zh-Hant": "Traditional Chinese",
+              "zh-CN": "Simplified Chinese", "zh-TW": "Traditional Chinese",
+              "en": "English", "en-US": "English", "en-GB": "English",
+              "ja": "Japanese", "ko": "Korean", "fr": "French", "de": "German",
+              "es": "Spanish", "ru": "Russian", "pt": "Portuguese", "it": "Italian",
+              "vi": "Vietnamese", "th": "Thai", "ar": "Arabic"}
+
+
 class OpenAIEngine:
     name = "openai"
 
@@ -292,10 +300,12 @@ class OpenAIEngine:
         self.url = (base or "https://api.openai.com/v1").rstrip("/") + "/chat/completions"
         self.model = model or "gpt-4o-mini"
         self._key = key
-        src = f" from {source}" if source and source != "auto" else ""
-        self.system = (f"You are a professional translator. Translate the user's text{src} "
-                       f"into {target}. Reply with the translation ONLY, preserving original "
-                       f"line breaks, punctuation style and placeholders. Never add notes.")
+        src = f" from {LANG_NAMES.get(source, source) if source and source != 'auto' else 'the detected source language'}"
+        target_name = LANG_NAMES.get(target, target)
+        self.system = (f"You are a simultaneous interpreter. Translate the user's text{src} "
+                       f"into {target_name}. Reply with the translation ONLY, preserving "
+                       f"original line breaks, punctuation style and placeholders. "
+                       f"Never add notes.")
 
     def call(self, text):
         body = {"model": self.model, "temperature": 0,
@@ -733,12 +743,15 @@ def main():
         ap.error("请用 -t 指定目标语言, 例如: -t zh-CN")
 
     engine_name = args.engine or cfg.get("engine") or "bing"
+    if engine_name == "openai" and not (os.environ.get("OPENAI_API_KEY") or cfg.get("openai_key")):
+        eprint("[提示] 未配置大模型密钥(openai_key), 已回退 bing 引擎")
+        engine_name = "bing"
     proxy = resolve_proxy(args.proxy, cfg)
     proxies = [proxy, ""] if proxy else [""]
     delay = args.delay if args.delay is not None else float(cfg.get("delay", 0.3))
     chunk = args.chunk if args.chunk is not None else int(cfg.get("chunk", 1000))
 
-    http = Http(proxies, delay=delay)
+    http = Http(proxies, delay=0.0 if engine_name == "openai" else delay)
     if engine_name == "bing":
         engine = BingEngine(http, args.source, target)
     elif engine_name == "google":
